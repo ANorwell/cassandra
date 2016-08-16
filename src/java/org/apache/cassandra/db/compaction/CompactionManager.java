@@ -1352,7 +1352,7 @@ public class CompactionManager implements CompactionManagerMBean
         public void afterExecute(Runnable r, Throwable t)
         {
             DebuggableThreadPoolExecutor.maybeResetTraceSessionWrapper(r);
-    
+
             if (t == null)
                 t = DebuggableThreadPoolExecutor.extractThrowable(r);
 
@@ -1401,8 +1401,12 @@ public class CompactionManager implements CompactionManagerMBean
     {
         List<Holder> compactionHolders = CompactionMetrics.getCompactions();
         List<Map<String, String>> out = new ArrayList<Map<String, String>>(compactionHolders.size());
-        for (CompactionInfo.Holder ci : compactionHolders)
-            out.add(ci.getCompactionInfo().asMap());
+        for (CompactionInfo.Holder ci : compactionHolders) {
+            CompactionInfo compactionInfo = ci.getCompactionInfo();
+            if (compactionInfo.getCFMetaData() != null) {
+                out.add(ci.getCompactionInfo().asMap());
+            }
+        }
         return out;
     }
 
